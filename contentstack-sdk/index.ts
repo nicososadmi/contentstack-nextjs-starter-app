@@ -27,6 +27,8 @@ const envConfig = process.env.CONTENTSTACK_API_KEY
 
 let customHostBaseUrl = envConfig.CONTENTSTACK_API_HOST as string;
 
+const language = envConfig.CONTENTSTACK_LOCALE as string;
+
 customHostBaseUrl = customHostBaseUrl? customHostUrl(customHostBaseUrl): '';
 
 // SDK initialization
@@ -67,7 +69,7 @@ export const getEntry = ({
   jsonRtePath,
 }: GetEntry) => {
   return new Promise((resolve, reject) => {
-    const query = Stack.ContentType(contentTypeUid).Query();
+    const query = Stack.ContentType(contentTypeUid).Query().language(language);
     if (referenceFieldPath) query.includeReference(referenceFieldPath);
     query
       .toJSON()
@@ -105,7 +107,7 @@ export const getEntryByUrl = ({
   jsonRtePath,
 }: GetEntryByUrl) => {
   return new Promise((resolve, reject) => {
-    const blogQuery = Stack.ContentType(contentTypeUid).Query();
+    const blogQuery = Stack.ContentType(contentTypeUid).Query().language(language);
     if (referenceFieldPath) blogQuery.includeReference(referenceFieldPath);
     blogQuery.toJSON();
     const data = blogQuery.where("url", `${entryUrl}`).find();
