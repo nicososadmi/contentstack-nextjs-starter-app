@@ -1,11 +1,11 @@
 import React from 'react';
 import moment from 'moment';
 import parse from 'html-react-parser';
-import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { Image } from "../typescript/action";
 
 type AdditionalParam = {
-  banner_title:string;
+  banner_title: string;
   banner_description: string;
   title: {};
   title_h2: string;
@@ -18,11 +18,10 @@ type Author = {
   $: AdditionalParam;
 }
 
-
 type BloglistProps = {
   body: string;
   url: string;
-  featured_image: Image; 
+  featured_image: Image;
   title: string;
   date: string;
   author: [Author];
@@ -30,30 +29,37 @@ type BloglistProps = {
 }
 
 function BlogList({ bloglist }: { bloglist: BloglistProps }) {
+  const router = useRouter();
+  const { locale } = router.query as { locale?: string };
+
+  const handleNavigation = (url: string) => {
+    const localizedUrl = `/${locale}${url}`;
+    if (router.asPath !== localizedUrl) {
+      router.push(localizedUrl);
+    }
+  };
+
   let body: string = bloglist.body && bloglist.body.substr(0, 300);
   const stringLength = body.lastIndexOf(' ');
   body = `${body.substr(0, Math.min(body.length, stringLength))}...`;
+
   return (
     <div className='blog-list'>
       {bloglist.featured_image && (
-        (<Link href={bloglist.url}>
-
+        <div onClick={() => handleNavigation(bloglist.url)} style={{ cursor: 'pointer' }}>
           <img
             className='blog-list-img'
             src={bloglist.featured_image.url}
             alt='blog img'
             {...bloglist.featured_image.$?.url as {}}
           />
-
-        </Link>)
+        </div>
       )}
       <div className='blog-content'>
         {bloglist.title && (
-          (<Link href={bloglist.url}>
-
-            <h3 {...bloglist.$?.title}>{bloglist.title}</h3>
-
-          </Link>)
+          <h3 onClick={() => handleNavigation(bloglist.url)} style={{ cursor: 'pointer' }} {...bloglist.$?.title}>
+            {bloglist.title}
+          </h3>
         )}
         <p>
           <strong {...bloglist.$?.date as {}}>
@@ -66,11 +72,9 @@ function BlogList({ bloglist }: { bloglist: BloglistProps }) {
         </p>
         <div {...bloglist.$?.body as {}}>{parse(body)}</div>
         {bloglist.url ? (
-          (<Link href={bloglist.url}>
-
-            <span>{'Read more -->'}</span>
-
-          </Link>)
+          <span onClick={() => handleNavigation(bloglist.url)} style={{ cursor: 'pointer' }}>
+            {'Read more -->'}
+          </span>
         ) : (
           ''
         )}

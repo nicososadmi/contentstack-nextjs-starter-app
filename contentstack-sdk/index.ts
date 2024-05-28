@@ -11,6 +11,7 @@ type GetEntry = {
   contentTypeUid: string;
   referenceFieldPath: string[] | undefined;
   jsonRtePath: string[] | undefined;
+  locale: string;
 };
 
 type GetEntryByUrl = {
@@ -18,6 +19,7 @@ type GetEntryByUrl = {
   contentTypeUid: string;
   referenceFieldPath: string[] | undefined;
   jsonRtePath: string[] | undefined;
+  locale: string;
 };
 
 const { publicRuntimeConfig } = getConfig();
@@ -26,6 +28,8 @@ const envConfig = process.env.CONTENTSTACK_API_KEY
   : publicRuntimeConfig;
 
 let customHostBaseUrl = envConfig.CONTENTSTACK_API_HOST as string;
+
+const language = envConfig.CONTENTSTACK_LOCALE as string;
 
 customHostBaseUrl = customHostBaseUrl? customHostUrl(customHostBaseUrl): '';
 
@@ -65,9 +69,10 @@ export const getEntry = ({
   contentTypeUid,
   referenceFieldPath,
   jsonRtePath,
+  locale
 }: GetEntry) => {
   return new Promise((resolve, reject) => {
-    const query = Stack.ContentType(contentTypeUid).Query();
+    const query = Stack.ContentType(contentTypeUid).Query().language(locale);
     if (referenceFieldPath) query.includeReference(referenceFieldPath);
     query
       .toJSON()
@@ -103,9 +108,15 @@ export const getEntryByUrl = ({
   entryUrl,
   referenceFieldPath,
   jsonRtePath,
+  locale
 }: GetEntryByUrl) => {
   return new Promise((resolve, reject) => {
-    const blogQuery = Stack.ContentType(contentTypeUid).Query();
+    console.log('hola 1', contentTypeUid);
+    console.log('hola 2', entryUrl);
+    console.log('hola 3', referenceFieldPath);
+    console.log('hola 4', jsonRtePath);
+    console.log('hola 5', locale);
+    const blogQuery = Stack.ContentType(contentTypeUid).Query().language(locale);
     if (referenceFieldPath) blogQuery.includeReference(referenceFieldPath);
     blogQuery.toJSON();
     const data = blogQuery.where("url", `${entryUrl}`).find();

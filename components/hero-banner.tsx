@@ -1,4 +1,5 @@
 import React from 'react';
+import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { Image, Action } from "../typescript/action";
 
@@ -22,8 +23,20 @@ type BannerProps = {
 }
 
 export default function HeroBanner(props: BannerProps) {
-
   const banner = props.banner;
+  const router = useRouter();
+  const { locale } = router.query as { locale?: string };
+
+  const buildLocalizedUrl = (url: string) => {
+    return `/${locale}${url}`;
+  };
+
+  const handleNavigation = (url: string) => {
+    const localizedUrl = buildLocalizedUrl(url);
+    if (router.asPath !== localizedUrl) {
+      router.push(localizedUrl);
+    }
+  };
 
   return (
     <div
@@ -45,7 +58,7 @@ export default function HeroBanner(props: BannerProps) {
         )}
         {banner.banner_description ? (
           <p
-            className='hero-description '
+            className='hero-description'
             style={{
               color: banner?.text_color ? banner.text_color : '#222',
             }}
@@ -57,14 +70,13 @@ export default function HeroBanner(props: BannerProps) {
           ''
         )}
         {banner.call_to_action.title && banner.call_to_action.href ? (
-          (<Link
-            href={banner?.call_to_action.href}
+          <button
+            onClick={() => handleNavigation(banner.call_to_action.href)}
             className='btn tertiary-btn'
-            {...banner.call_to_action.$?.title}>
-
+            {...banner.call_to_action.$?.title}
+          >
             {banner?.call_to_action.title}
-
-          </Link>)
+          </button>
         ) : (
           ''
         )}
