@@ -1,15 +1,16 @@
-import App from 'next/app';
+import App, { AppContext } from 'next/app';
 import Head from 'next/head';
 import Router from 'next/router';
 import NProgress from 'nprogress';
 import Layout from '../components/layout';
-import { getHeaderRes, getFooterRes, getAllEntries } from '../helper';
+import { getHeaderRes, getFooterRes, getAllEntries, getLocale, getPageLocale } from '../helper';
 import 'nprogress/nprogress.css';
 import '../styles/third-party.css';
 import '../styles/style.css';
 import 'react-loading-skeleton/dist/skeleton.css';
 import '@contentstack/live-preview-utils/dist/main.css';
 import { Props } from "../typescript/pages";
+import { NextPageContext } from 'next';
 
 
 Router.events.on('routeChangeStart', () => NProgress.start());
@@ -17,6 +18,7 @@ Router.events.on('routeChangeComplete', () => NProgress.done());
 Router.events.on('routeChangeError', () => NProgress.done());
 
 function MyApp(props: Props) {
+  console.log('ALL ENTRIES', props)
   const { Component, pageProps, header, footer, entries } = props;
   const { page, posts, archivePost, blogPost } = pageProps;
 
@@ -71,12 +73,16 @@ function MyApp(props: Props) {
   );
 }
 
-MyApp.getInitialProps = async (appContext: any) => {
+MyApp.getInitialProps = async (appContext: AppContext) => {
+  const { query } = appContext.ctx;
+  const locale = getPageLocale((query.locale as string) || 'en')
   const appProps = await App.getInitialProps(appContext);
-  const header = await getHeaderRes();
-  const footer = await getFooterRes();
-  const entries = await getAllEntries();
+  const header = await getHeaderRes(locale);
+  const footer = await getFooterRes(locale);
+  const entries = await getAllEntries(locale);
 
+  console.log('APPP', appContext)
+  console.log('ENTRYY',entries)
   return { ...appProps, header, footer, entries };
 };
 

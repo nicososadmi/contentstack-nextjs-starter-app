@@ -1,21 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import moment from 'moment';
 import parse from 'html-react-parser';
-import { getPageRes, getBlogPostRes } from '../../helper';
+import { getPageRes, getBlogPostRes, getPageLocale, getLocale } from '../../helper';
 import { onEntryChange } from '../../contentstack-sdk';
 import Skeleton from 'react-loading-skeleton';
 import RenderComponents from '../../components/render-components';
 import ArchiveRelative from '../../components/archive-relative';
 import { Page, BlogPosts, PageUrl } from "../../typescript/pages";
+import { useRouter } from 'next/router';
 
 
 export default function BlogPost({ blogPost, page, pageUrl }: {blogPost: BlogPosts, page: Page, pageUrl: PageUrl}) {
-  
+  console.log('CLIENT 1', blogPost);
+  console.log('PAGE', page);
+  console.log('URL', pageUrl)
   const [getPost, setPost] = useState({ banner: page, post: blogPost });
+  const router = useRouter();
+  const locale = getLocale(router);
   async function fetchData() {
     try {
-      const entryRes = await getBlogPostRes(pageUrl);
-      const bannerRes = await getPageRes('/blog');
+      const entryRes = await getBlogPostRes(pageUrl, locale);
+      const bannerRes = await getPageRes('/blog', locale);
       if (!entryRes || !bannerRes) throw new Error('Status: ' + 404);
       setPost({ banner: bannerRes, post: entryRes });
     } catch (error) {
@@ -93,10 +98,12 @@ export default function BlogPost({ blogPost, page, pageUrl }: {blogPost: BlogPos
     </>
   );
 }
-export async function getServerSideProps({ params }: any) {
+export async function getServerSideProps({ params, query }: any) {
   try {
-    const page = await getPageRes('/blog');
-    const posts = await getBlogPostRes(`/blog/${params.post}`);
+    const { locale } = query as { locale?: string };
+    const csLocale = getPageLocale(locale || 'en');
+    const page = await getPageRes('/blog', csLocale);
+    const posts = await getBlogPostRes(`/blog/${params.post}`, csLocale);
     if (!page || !posts) throw new Error('404');
 
     return {

@@ -2,19 +2,22 @@ import React, { useState, useEffect } from 'react';
 import { onEntryChange } from '../../contentstack-sdk';
 import BlogList from '../../components/blog-list';
 import RenderComponents from '../../components/render-components';
-import { getPageRes, getBlogListRes } from '../../helper';
+import { getPageRes, getBlogListRes, getLocale, getPageLocale } from '../../helper';
 
 import ArchiveRelative from '../../components/archive-relative';
 import Skeleton from 'react-loading-skeleton';
 import { Page, PostPage, PageUrl, Context } from "../../typescript/pages";
+import { useRouter } from 'next/router';
 
 
 export default function Blog({ page, posts, archivePost, pageUrl }: {page: Page, posts: PostPage, archivePost: PostPage, pageUrl: PageUrl}) {
 
   const [getBanner, setBanner] = useState(page);
+  const router = useRouter();
+  const csLocale = getLocale(router);
   async function fetchData() {
     try {
-      const bannerRes = await getPageRes(pageUrl);
+      const bannerRes = await getPageRes(pageUrl, csLocale);
       if (!bannerRes) throw new Error('Status code 404');
       setBanner(bannerRes);
     } catch (error) {
@@ -63,11 +66,13 @@ export default function Blog({ page, posts, archivePost, pageUrl }: {page: Page,
   );
 }
 
-export async function getServerSideProps(context: Context) {
+export async function getServerSideProps(context: any) {
   try {
-    const page = await getPageRes(context.resolvedUrl);
-    const result = await getBlogListRes();
-
+    const { locale } = context.query as { locale?: string };
+    const csLocale = getPageLocale(locale || 'en');
+    const page = await getPageRes(context.resolvedUrl, csLocale);
+    const result = await getBlogListRes(csLocale);
+    console.log('CONTEEEXT', context)
     const archivePost = [] as any;
     const posts = [] as any;
     result.forEach((blogs) => {

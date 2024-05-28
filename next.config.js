@@ -3,6 +3,14 @@ const withPWA = require("next-pwa")({
 });
 
 const config = {
+  async rewrites() {
+    return [
+      {
+        source: '/:locale(en|fr)/:path*',
+        destination: '/:path*',
+      },
+    ];
+  },
   publicRuntimeConfig: {
     // Will be available on both server and client
     CONTENTSTACK_API_KEY: process.env.CONTENTSTACK_API_KEY,

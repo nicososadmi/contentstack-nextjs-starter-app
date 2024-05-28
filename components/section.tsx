@@ -1,4 +1,5 @@
 import React from 'react';
+import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { Image, Action } from "../typescript/action";
 
@@ -13,7 +14,7 @@ type AdditionalParam = {
 }
 
 type SectionProps = {
-  title_h2: String;
+  title_h2: string;
   description: string;
   call_to_action: Action;
   image: Image;
@@ -21,7 +22,21 @@ type SectionProps = {
   $: AdditionalParam;
 } 
 
-export default function Section({ section }: {section : SectionProps}) {
+export default function Section({ section }: { section: SectionProps }) {
+  const router = useRouter();
+  const { locale } = router.query as { locale?: string };
+
+  const buildLocalizedUrl = (url: string) => {
+    return `/${locale}${url}`;
+  };
+
+  const handleNavigation = (url: string) => {
+    const localizedUrl = buildLocalizedUrl(url);
+    if (router.asPath !== localizedUrl) {
+      router.push(localizedUrl);
+    }
+  };
+
   function contentSection(key: any) {
     return (
       <div className='home-content' key={key}>
@@ -32,14 +47,13 @@ export default function Section({ section }: {section : SectionProps}) {
           <p {...section.$?.description as {}}>{section.description}</p>
         )}
         {section.call_to_action.title && section.call_to_action.href ? (
-          (<Link
-            href={section.call_to_action.href}
+          <button
+            onClick={() => handleNavigation(section.call_to_action.href)}
             className='btn secondary-btn'
-            {...section.call_to_action.$?.title}>
-
+            {...section.call_to_action.$?.title}
+          >
             {section.call_to_action.title}
-
-          </Link>)
+          </button>
         ) : (
           ''
         )}
@@ -57,11 +71,12 @@ export default function Section({ section }: {section : SectionProps}) {
       />
     );
   }
+
   return (
     <div className='home-advisor-section'>
       {section.image_alignment === 'Left'
-        ? [imageContent('key-image'), contentSection('key-contentstection')]
-        : [contentSection('key-contentstection'), imageContent('key-image')]}
+        ? [imageContent('key-image'), contentSection('key-contentsection')]
+        : [contentSection('key-contentsection'), imageContent('key-image')]}
     </div>
   );
 }

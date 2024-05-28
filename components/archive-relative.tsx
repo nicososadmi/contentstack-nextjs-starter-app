@@ -1,5 +1,5 @@
 import React from 'react';
-import Link from 'next/link';
+import { useRouter } from 'next/router';
 import parse from 'html-react-parser';
 
 type AdditionalParam = {
@@ -19,18 +19,30 @@ type BlogListProps = {
 }
 
 export default function ArchiveRelative({ blogs }: BlogListProps) {
-  return <>
-    {blogs?.map((blog, idx) => (
-      (<Link href={blog.url} key={idx}>
+  const router = useRouter();
+  const { locale } = router.query as { locale?: string };
 
-        <div>
+  const handleNavigation = (url: string) => {
+    const localizedUrl = `/${locale}${url}`;
+    if (router.asPath !== localizedUrl) {
+      router.push(localizedUrl);
+    }
+  };
+
+  return (
+    <>
+      {blogs?.map((blog, idx) => (
+        <div
+          key={idx}
+          onClick={() => handleNavigation(blog.url)}
+          style={{ cursor: 'pointer' }}
+        >
           <h4 {...blog.$?.title as {}}>{blog.title}</h4>
           {typeof blog.body === 'string' && (
             <div {...blog.$?.body as {}}>{parse(blog.body.slice(0, 80))}</div>
           )}
         </div>
-
-      </Link>)
-    ))}
-  </>;
+      ))}
+    </>
+  );
 }

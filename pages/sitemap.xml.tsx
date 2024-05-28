@@ -1,16 +1,18 @@
-import { getAllEntries, getBlogListRes } from '../helper';
+import { getAllEntries, getBlogListRes, getPageLocale } from '../helper';
 import { Context, Pages, PostPage } from "../typescript/pages";
 
 const Sitemap = () => {
   return null;
 };
 
-export const getServerSideProps = async ({ res }: {res: Context}) => {
+export const getServerSideProps = async ({ res, query }: any) => {
 
   const baseUrl = process.env.NEXT_PUBLIC_HOSTED_URL || 'http://localhost:3000';
-
-  let pages = await getAllEntries();
-  let posts = await getBlogListRes();
+  const { locale } = query as { locale?: string };
+  const csLocale = getPageLocale(locale || 'en');
+  
+  let pages = await getAllEntries(csLocale);
+  let posts = await getBlogListRes(csLocale);
 
   const allPages = pages.map((page) => `${baseUrl}${page.url}`);
   const allPosts = posts.map((post) => `${baseUrl}${post.url}`);

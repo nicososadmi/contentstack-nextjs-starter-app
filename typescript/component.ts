@@ -105,7 +105,7 @@ export type AdditionalParamProps = {
   }
   
 export type SectionProps = {
-    title_h2: String;
+    title_h2: string;
     description: string;
     call_to_action: Action;
     image: Image;
