@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
+import { useRouter } from 'next/router';
 import parse from 'html-react-parser';
 import { onEntryChange } from '../contentstack-sdk';
-import { getFooterRes } from '../helper';
+import { getFooterRes, getLocale } from '../helper';
 import Skeleton from 'react-loading-skeleton';
 import { FooterProps, Entry, Links } from "../typescript/layout";
 
-export default function Footer({ footer, entries }: {footer: FooterProps, entries: Entry}) {
-
+export default function Footer({ footer, entries }: { footer: FooterProps, entries: Entry }) {
+  const router = useRouter();
+  const { locale } = router.query as { locale?: string };
+  const csLocale = getLocale(router);
   const [getFooter, setFooter] = useState(footer);
-  
+
   function buildNavigation(ent: Entry, ft: FooterProps) {
     let newFooter = { ...ft };
     if (ent.length !== newFooter.navigation.link.length) {
@@ -32,7 +34,7 @@ export default function Footer({ footer, entries }: {footer: FooterProps, entrie
   async function fetchData() {
     try {
       if (footer && entries) {
-        const footerRes = await getFooterRes();
+        const footerRes = await getFooterRes(csLocale);
         const newfooter = buildNavigation(entries, footerRes);
         setFooter(newfooter);
       }
@@ -47,22 +49,25 @@ export default function Footer({ footer, entries }: {footer: FooterProps, entrie
 
   const footerData = getFooter ? getFooter : undefined;
 
+  const handleNavigation = (url: string) => {
+    const localizedUrl = `/${locale}${url}`;
+    if (router.asPath !== localizedUrl) {
+      router.push(localizedUrl);
+    }
+  };
+
   return (
     <footer>
       <div className='max-width footer-div'>
-        <div className='col-quarter'>
+        <div className='col-quarter' onClick={() => handleNavigation('/')} style={{ cursor: 'pointer' }}>
           {footerData && footerData.logo ? (
-            (<Link href='/' className='logo-tag'>
-
-              <img
-                src={footerData.logo.url}
-                alt={footerData.title}
-                title={footerData.title}
-                {...footer.logo.$?.url as {}}
-                className='logo footer-logo'
-              />
-
-            </Link>)
+            <img
+              src={footerData.logo.url}
+              alt={footerData.title}
+              title={footerData.title}
+              {...footerData.logo.$?.url as {}}
+              className='logo footer-logo'
+            />
           ) : (
             <Skeleton width={150} />
           )}
@@ -77,7 +82,12 @@ export default function Footer({ footer, entries }: {footer: FooterProps, entrie
                     key={menu.title}
                     {...menu.$?.title}
                   >
-                    <Link href={menu.href} legacyBehavior>{menu.title}</Link>
+                    <a
+                      onClick={() => handleNavigation(menu.href)}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      {menu.title}
+                    </a>
                   </li>
                 ))
               ) : (

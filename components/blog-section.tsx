@@ -1,10 +1,10 @@
 import React from 'react';
-import Link from 'next/link';
+import { useRouter } from 'next/router';
 import parse from 'html-react-parser';
 import { Image } from "../typescript/action";
 
 type AdditionalParam = {
-  banner_title:string;
+  banner_title: string;
   banner_description: string;
   title: {};
   title_h2: string;
@@ -29,17 +29,25 @@ type FeaturedBlog = {
 type FeaturedBlogData = {
   title_h2: string;
   view_articles: Article;
-  featured_blogs: [FeaturedBlog]
+  featured_blogs: [FeaturedBlog];
   $: AdditionalParam;
 }
 
 type FeaturedBlogProps = {
   fromBlog: FeaturedBlogData;
-  }
+}
 
 export default function BlogSection(props: FeaturedBlogProps) {
-
+  const router = useRouter();
+  const { locale } = router.query as { locale?: string };
   const fromBlog = props.fromBlog;
+
+  const handleNavigation = (url: string) => {
+    const localizedUrl = `/${locale}${url}`;
+    if (router.asPath !== localizedUrl) {
+      router.push(localizedUrl);
+    }
+  };
 
   return (
     <div className='community-section'>
@@ -48,14 +56,14 @@ export default function BlogSection(props: FeaturedBlogProps) {
           <h2 {...fromBlog.$?.title_h2 as {}}>{fromBlog.title_h2}</h2>
         )}
         {fromBlog.view_articles && (
-          (<Link
-            href={fromBlog.view_articles.href}
+          <div
+            onClick={() => handleNavigation(fromBlog.view_articles.href)}
             className='btn secondary-btn article-btn'
-            {...fromBlog.view_articles.$?.title}>
-
+            style={{ cursor: 'pointer' }}
+            {...fromBlog.view_articles.$?.title}
+          >
             {fromBlog.view_articles.title}
-
-          </Link>)
+          </div>
         )}
       </div>
       <div className='home-featured-blogs'>
@@ -75,9 +83,13 @@ export default function BlogSection(props: FeaturedBlogProps) {
                 <div>{parse(blog.body.slice(0, 300))}</div>
               )}
               {blog.url && (
-                <Link href={blog.url} passHref className='blogpost-readmore'>
+                <div
+                  onClick={() => handleNavigation(blog.url)}
+                  className='blogpost-readmore'
+                  style={{ cursor: 'pointer' }}
+                >
                   {'Read More -->'}
-                </Link>
+                </div>
               )}
             </div>
           </div>

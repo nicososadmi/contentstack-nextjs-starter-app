@@ -11,6 +11,7 @@ type GetEntry = {
   contentTypeUid: string;
   referenceFieldPath: string[] | undefined;
   jsonRtePath: string[] | undefined;
+  locale: string;
 };
 
 type GetEntryByUrl = {
@@ -18,6 +19,7 @@ type GetEntryByUrl = {
   contentTypeUid: string;
   referenceFieldPath: string[] | undefined;
   jsonRtePath: string[] | undefined;
+  locale: string;
 };
 
 const { publicRuntimeConfig } = getConfig();
@@ -67,9 +69,10 @@ export const getEntry = ({
   contentTypeUid,
   referenceFieldPath,
   jsonRtePath,
+  locale
 }: GetEntry) => {
   return new Promise((resolve, reject) => {
-    const query = Stack.ContentType(contentTypeUid).Query().language(language);
+    const query = Stack.ContentType(contentTypeUid).Query().language(locale);
     if (referenceFieldPath) query.includeReference(referenceFieldPath);
     query
       .toJSON()
@@ -105,9 +108,10 @@ export const getEntryByUrl = ({
   entryUrl,
   referenceFieldPath,
   jsonRtePath,
+  locale
 }: GetEntryByUrl) => {
   return new Promise((resolve, reject) => {
-    const blogQuery = Stack.ContentType(contentTypeUid).Query().language(language);
+    const blogQuery = Stack.ContentType(contentTypeUid).Query().language(locale);
     if (referenceFieldPath) blogQuery.includeReference(referenceFieldPath);
     blogQuery.toJSON();
     const data = blogQuery.where("url", `${entryUrl}`).find();
