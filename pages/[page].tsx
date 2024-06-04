@@ -13,7 +13,6 @@ export default function Page(props: Props) {
   const locale = getLocale(router);
   async function fetchData() {
     try {
-      console.log('ENTRY URLL', entryUrl)
       const entryRes = await getPageRes(entryUrl, locale);
       if (!entryRes) throw new Error('Status code 404');
       setEntry(entryRes);
@@ -53,7 +52,6 @@ export async function getServerSideProps({params, query}: any) {
       };
 
   } catch (error) {
-    console.log('ERRORR', error)
     return { notFound: true };
   }
 }

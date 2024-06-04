@@ -111,11 +111,6 @@ export const getEntryByUrl = ({
   locale
 }: GetEntryByUrl) => {
   return new Promise((resolve, reject) => {
-    console.log('hola 1', contentTypeUid);
-    console.log('hola 2', entryUrl);
-    console.log('hola 3', referenceFieldPath);
-    console.log('hola 4', jsonRtePath);
-    console.log('hola 5', locale);
     const blogQuery = Stack.ContentType(contentTypeUid).Query().language(locale);
     if (referenceFieldPath) blogQuery.includeReference(referenceFieldPath);
     blogQuery.toJSON();

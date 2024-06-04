@@ -18,7 +18,6 @@ Router.events.on('routeChangeComplete', () => NProgress.done());
 Router.events.on('routeChangeError', () => NProgress.done());
 
 function MyApp(props: Props) {
-  console.log('ALL ENTRIES', props)
   const { Component, pageProps, header, footer, entries } = props;
   const { page, posts, archivePost, blogPost } = pageProps;
 
@@ -81,8 +80,6 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
   const footer = await getFooterRes(locale);
   const entries = await getAllEntries(locale);
 
-  console.log('APPP', appContext)
-  console.log('ENTRYY',entries)
   return { ...appProps, header, footer, entries };
 };
 

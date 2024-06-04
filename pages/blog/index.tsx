@@ -72,7 +72,6 @@ export async function getServerSideProps(context: any) {
     const csLocale = getPageLocale(locale || 'en');
     const page = await getPageRes(context.resolvedUrl, csLocale);
     const result = await getBlogListRes(csLocale);
-    console.log('CONTEEEXT', context)
     const archivePost = [] as any;
     const posts = [] as any;
     result.forEach((blogs) => {

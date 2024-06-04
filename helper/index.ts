@@ -49,7 +49,6 @@ export const getAllEntries = async (locale: string): Promise<Page[]> => {
 };
 
 export const getPageRes = async (entryUrl: string, locale: string): Promise<Page> => {
-  console.log('ENTRY URL 3', entryUrl)
   entryUrl = entryUrl.replace(/\/(en|fr)/g, '') 
            .replace(/\?locale=(en|fr)/g, '') 
            .replace(/\?$/, '')
@@ -57,7 +56,6 @@ export const getPageRes = async (entryUrl: string, locale: string): Promise<Page
   if (entryUrl === '') {
     entryUrl = '/'
   }
-  console.log('ENTRY URL2', entryUrl)
 
   const response = (await getEntryByUrl({
     contentTypeUid: "page",

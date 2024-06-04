@@ -11,9 +11,6 @@ import { useRouter } from 'next/router';
 
 
 export default function BlogPost({ blogPost, page, pageUrl }: {blogPost: BlogPosts, page: Page, pageUrl: PageUrl}) {
-  console.log('CLIENT 1', blogPost);
-  console.log('PAGE', page);
-  console.log('URL', pageUrl)
   const [getPost, setPost] = useState({ banner: page, post: blogPost });
   const router = useRouter();
   const locale = getLocale(router);
